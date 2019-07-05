@@ -20,6 +20,7 @@
   <depend>serial</depend>
   <depend>roscpp</depend>
   <depend>sensor_msgs</depend>
+  <depend>tf</depend>
 
   <build_depend>message_generation</build_depend>
 

@@ -11,6 +11,7 @@ from sensor_msgs.msg import Imu
 import numpy as np
 from geometry_msgs.msg import Vector3Stamped
 import tf
+import math
 
 
 
@@ -18,14 +19,14 @@ def imu_callback(data):
     input_quat = (data.orientation.x, data.orientation.y, data.orientation.z, data.orientation.w)
     orientation_input_data = tf.transformations.euler_from_quaternion(input_quat, axes='sxyz')
     
-    rpy_pub = rospy.Publisher('imu/test_rpy', Vector3Stamped, queue_size=10)
+    rpy_pub = rospy.Publisher('imu/rpy_deg', Vector3Stamped, queue_size=10)
     rpy_msg = Vector3Stamped()
-    rpy_msg.vector.x = orientation_input_data[0]
-    rpy_msg.vector.y = orientation_input_data[1]
-    rpy_msg.vector.z = orientation_input_data[2]
-    print rpy_msg.vector.z;
+    rpy_msg.vector.x = orientation_input_data[0]*180/math.pi
+    rpy_msg.vector.y = orientation_input_data[1]*180/math.pi
+    rpy_msg.vector.z = orientation_input_data[2]*180/math.pi
+    print rpy_msg.vector.z # + 180 # OFFSET from output
     
-    rpy_pub.publish(rpy_msg);
+    rpy_pub.publish(rpy_msg)
 
 def main():
     rospy.init_node('imu test', anonymous=True)
