@@ -1,0 +1,10 @@
+<?xml version="1.0" ?>
+
+<launch>
+
+  <node pkg="um7" type="um7_driver" name="um7_imu" clear_params="true" output="screen">
+    <param name="_port" value="/tty/USB0"/>
+    <param name="_tf_ned_to_enu" value="true"/>
+  </node> 
+
+</launch>
