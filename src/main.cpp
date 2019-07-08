@@ -342,7 +342,7 @@ int main(int argc, char **argv)
   private_nh.param<int32_t>("baud", baud, 115200);
 
   double yaw_offset_from_east;
-  private_nh.param<double>("yaw_offset_rad", yaw_offset_from_east, 0.0);
+  private_nh.param<double>("yaw_offset_rad", yaw_offset_from_east, 3.14159);
 
 
   serial::Serial ser;
