@@ -4,7 +4,7 @@
 
   <arg name="port" default="/dev/ttyUSB0"/>
 
-  <node pkg="um7" type="um7_driver" name="um7_imu" output="screen">
+  <node pkg="thorvald_um7" type="thorvald_um7_driver" name="um7_imu" output="screen">
      <param name="port" value="$(arg port)"/>
   </node> 
 

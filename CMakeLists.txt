@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 2.8.3)
-project(um7)
+project(thorvald_um7)
 
 find_package(catkin REQUIRED COMPONENTS roscpp serial sensor_msgs message_generation tf)
 
@@ -26,15 +26,15 @@ include_directories(include
 )
 
 ## Declare a cpp executable
-add_executable(um7_driver src/main.cpp src/registers.cpp src/comms.cpp)
-target_link_libraries(um7_driver ${catkin_LIBRARIES} )
-add_dependencies(um7_driver um7_generate_messages_cpp)
+add_executable(thorvald_um7_driver src/main.cpp src/registers.cpp src/comms.cpp)
+target_link_libraries(thorvald_um7_driver ${catkin_LIBRARIES} )
+add_dependencies(thorvald_um7_driver thorvald_um7_generate_messages_cpp)
 
 #############
 ## Install ##
 #############
 
-install(TARGETS um7_driver
+install(TARGETS thorvald_um7_driver
   RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
 )
 
