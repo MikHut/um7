@@ -33,7 +33,7 @@
  *
  */
 #include <string>
-
+#include <tf2_geometry_msgs/tf2_geometry_msgs.h>
 #include "geometry_msgs/Vector3Stamped.h"
 #include "ros/ros.h"
 #include "sensor_msgs/Imu.h"
@@ -204,7 +204,8 @@ bool handleResetService(um7::Comms* sensor,
  * Uses the register accessors to grab data from the IMU, and populate
  * the ROS messages which are output.
  */
-void publishMsgs(um7::Registers& r, ros::NodeHandle* imu_nh, sensor_msgs::Imu& imu_msg, bool tf_ned_to_enu)
+void publishMsgs(um7::Registers& r, ros::NodeHandle* imu_nh, sensor_msgs::Imu& imu_msg, bool tf_ned_to_enu,
+double yaw_offset)
 {
   static ros::Publisher imu_pub = imu_nh->advertise<sensor_msgs::Imu>("data", 1, false);
   static ros::Publisher mag_pub = imu_nh->advertise<geometry_msgs::Vector3Stamped>("mag", 1, false);
@@ -218,10 +219,19 @@ void publishMsgs(um7::Registers& r, ros::NodeHandle* imu_nh, sensor_msgs::Imu& i
     if (tf_ned_to_enu)
     {
       // world frame
-      imu_msg.orientation.w =  r.quat.get_scaled(2);
-      imu_msg.orientation.x =  r.quat.get_scaled(1);
-      imu_msg.orientation.y = -r.quat.get_scaled(3);
-      imu_msg.orientation.z =  r.quat.get_scaled(0);
+      tf2::Quaternion q_orig, q_rot, q_new;
+      q_orig[0] = r.quat.get_scaled(1);
+      q_orig[1] = -r.quat.get_scaled(2);
+      q_orig[2] = -r.quat.get_scaled(3);
+      q_orig[3] = r.quat.get_scaled(0);
+
+      q_rot.setRPY(0, 0, yaw_offset);
+
+      q_new = q_rot*q_orig;  // Calculate the new orientation
+      q_new.normalize();
+
+      // Stuff the new rotation back into the pose. This requires conversion into a msg type
+      tf2::convert(q_new, imu_msg.orientation);
 
       // body-fixed frame
       imu_msg.angular_velocity.x =  r.gyro.get_scaled(0);
@@ -317,10 +327,12 @@ int main(int argc, char **argv)
   // Load parameters from private node handle.
   std::string port;
   int32_t baud;
+  double yaw_offset_from_east;
 
   ros::NodeHandle imu_nh("imu"), private_nh("~");
   private_nh.param<std::string>("port", port, "/dev/ttyUSB0");
   private_nh.param<int32_t>("baud", baud, 115200);
+  private_nh.param<double>("yaw_offset_rad", yaw_offset_from_east, 3.14159);
 
   serial::Serial ser;
   ser.setPort(port);
@@ -396,7 +408,7 @@ int main(int argc, char **argv)
           {
             // Triggered by arrival of final message in group.
             imu_msg.header.stamp = ros::Time::now();
-            publishMsgs(registers, &imu_nh, imu_msg, tf_ned_to_enu);
+            publishMsgs(registers, &imu_nh, imu_msg, tf_ned_to_enu, yaw_offset_from_east);
             ros::spinOnce();
           }
         }
