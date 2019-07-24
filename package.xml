@@ -6,6 +6,7 @@
     corresponding ROS node for publishing standard ROS orientation topics from a UM7.
   </description>
 
+  <maintainer email="mhutchinson@sagarobotics.com">Michael Hutchinson</maintainer>
   <maintainer email="dgmiller@ncsu.edu">Daniel Miller</maintainer>
   <maintainer email="tbaltovski@clearpathrobotics.com">Tony Baltovski</maintainer>  
   <author email="mpurvis@clearpathrobotics.com">Mike Purvis</author>
